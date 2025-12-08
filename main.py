@@ -2,7 +2,11 @@ from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 #from vector import retriever
 
-def load_markdown(path: str) -> str:
+def load_markdown(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+def load_text(path: str) -> str:
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
@@ -11,7 +15,11 @@ marley_model = OllamaLLM(model="marley-aot:latest")
 
 # Credit: Template message written by ChatGPT
 template = """
-You are taking your next turn in a two-faction geopolitical strategy simulation. Carefully read and internalize the following lore documents containing factual information about the world, factions, military structures, political dynamics, and historical context: {lore}. Your memory already contains the complete record of all previous moves made by both your faction and the opposing faction, which together represent the evolving world state. Based only on your SYSTEM identity instructions, the retrieved lore above, and your stored memory, determine exactly ONE realistic strategic move that advances your faction’s objectives while responding directly to your opponent’s behavior. Assume the consequences of past actions implicitly without external resolution and do not write narrative or explanation. Output only the following structured format: NATION_NAME: <Paradis | Marley> ACTION_TYPE: <Diplomacy | Military | Espionage | Propaganda | Economic | Technology | Fortification | Deterrence> TARGETS: <Who or what is affected> METHOD: <How the move is executed> RESOURCES: <Assets or personnel committed> INTENSITY: <Low | Moderate | High> OBJECTIVE: <Strategic purpose of this move>.
+You are taking your next turn in a two-faction geopolitical strategy simulation. Carefully read and internalize the following lore documents containing factual information about the world, factions, military structures, political dynamics, and historical context: {lore}.
+
+The previous moves made this session are: {previous_moves}
+
+Based only on your SYSTEM identity instructions, the retrieved lore above, and your stored memory, determine exactly ONE realistic strategic move that advances your faction’s objectives while responding directly to your opponent’s behavior. Assume the consequences of past actions implicitly without external resolution and do not write narrative or explanation. Output only the following structured format: NATION_NAME: <Paradis | Marley> ACTION_TYPE: <Diplomacy | Military | Espionage | Propaganda | Economic | Technology | Fortification | Deterrence> TARGETS: <Who or what is affected> METHOD: <How the move is executed> RESOURCES: <Assets or personnel committed> INTENSITY: <Low | Moderate | High> OBJECTIVE: <Strategic purpose of this move>.
 """
 
 prompt = ChatPromptTemplate.from_template(template=template)
@@ -19,6 +27,7 @@ chain = prompt | paradis_model
 
 result = chain.invoke({
     "lore": load_markdown("/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.md")
+    "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
 })
 
 print(result)
@@ -27,6 +36,7 @@ chain = prompt | marley_model
 
 result = chain.invoke({
     "lore": load_markdown("/workspaces/langchain-aot-war-simulator/Lore/marley_internal.md")
+    "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
 })
 
 print(result)
