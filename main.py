@@ -1,6 +1,10 @@
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
-from vector import retriever
+#from vector import retriever
+
+def load_markdown(path: str) -> str:
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
 paradis_model = OllamaLLM(model="paradis-aot:latest")
 marley_model = OllamaLLM(model="marley-aot:latest")
@@ -14,7 +18,7 @@ prompt = ChatPromptTemplate.from_template(template=template)
 chain = prompt | paradis_model
 
 result = chain.invoke({
-    "lore": retriever.invoke("Provide relevant lore for the next strategic move in the simulation.")
+    "lore": load_markdown("/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.md")
 })
 
 print(result)
@@ -22,7 +26,7 @@ print(result)
 chain = prompt | marley_model
 
 result = chain.invoke({
-    "lore": retriever.invoke("Provide relevant lore for the next strategic move in the simulation.")
+    "lore": load_markdown("/workspaces/langchain-aot-war-simulator/Lore/marley_internal.md")
 })
 
 print(result)
