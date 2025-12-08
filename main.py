@@ -11,7 +11,15 @@ You are taking your next turn in a two-faction geopolitical strategy simulation.
 """
 
 prompt = ChatPromptTemplate.from_template(template=template)
-chain = prompt | paradis_model | prompt | marley_model
+chain = prompt | paradis_model
+
+result = chain.invoke({
+    "lore": retriever.invoke("Provide relevant lore for the next strategic move in the simulation.")
+})
+
+print(result)
+
+chain = prompt | marley_model
 
 result = chain.invoke({
     "lore": retriever.invoke("Provide relevant lore for the next strategic move in the simulation.")

@@ -40,7 +40,7 @@ if add_documents:
     
 vector_store = Chroma(
     collection_name="aot_lore",
-    persistent_directory=db_location,
+    persist_directory=db_location,
     embedding_function=embeddings
 )
 
