@@ -1,0 +1,6 @@
+ACTION_TYPE: Propaganda
+TARGETS: Global Media Network, Paradis/Eldia Relations
+METHOD: Release a carefully crafted public statement framing the recapture of Wall Maria by Marley as a humanitarian effort to protect civilians from Paradis' "brutal regime".
+RESOURCES: 500 Marley-controlled media outlets, 2000 propaganda specialists
+INTENSITY: High
+OBJECTIVE: Shift global opinion against Paradis and increase pressure on their leadership.
