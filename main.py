@@ -46,6 +46,10 @@ def write_text(path, content):
     with open(path, "a", encoding="utf-8") as f:
         f.write(content)
 
+def clear_text(path):
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("")
+
 def load_pdf(path):
     loader = PyPDFLoader(path)
     pages = loader.load_and_split()
@@ -85,28 +89,50 @@ def format_documents(sections):
     return output_string
 
 def generate_response(chain, retriever):
-    document_chain = retriever.invoke(query)
+    document_chain = retriever.invoke("Find the most relevant lore documents for the next move.")
     context = format_documents(document_chain)
     result = chain.invoke({
         "lore": context,
         "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
     })
+    if chain == chain_paradis:
+        empire = "PARADIS"
+    else:
+        empire = "MARLEY"
+    print(f"{empire} MOVE:")
+    print(result)
+    write_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt", f"{empire}:\n{result}")
     
-#############################################################################################################
+def main():
+    # Load and process documents
+    paradis_chunks = chunk_pdf(load_pdf("/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.pdf"))
+    marley_chunks = chunk_pdf(load_pdf("/workspaces/langchain-aot-war-simulator/Lore/marley_internal.pdf"))
 
-result = chain_paradis.invoke({
-    "lore": load_pdf("/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.pdf"),
-    "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
-})
+    # Build or load vector databases
+    paradis_vector_store = build_or_load_vectors("paradis", paradis_chunks)
+    marley_vector_store = build_or_load_vectors("marley", marley_chunks)
 
+    # Create retrievers
+    paradis_retriever = paradis_vector_store.as_retriever(
+        search_type = "similarity_score_threshold",
+        search_kwargs={
+            "k": 2,
+            "score_threshold": 0.1,
+        })
+    marley_retriever = marley_vector_store.as_retriever(
+        search_type = "similarity_score_threshold",
+        search_kwargs={
+            "k": 2,
+            "score_threshold": 0.1,
+        })
+    # Generate responses
+    while True:
+        generate_response(chain_paradis, paradis_retriever)
+        generate_response(chain_marley, marley_retriever)
+        exit_condition = input("Continue simulation? (y/n): ")
+        if exit_condition.lower() != 'y':
+            break
 
-print(result)
-write_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt", result)
-
-result = chain_marley.invoke({
-    "lore": load_pdf("/workspaces/langchain-aot-war-simulator/Lore/marley_internal.pdf"),
-    "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
-})
-
-print(result)
-write_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt", result)
+if __name__ == "__main__":
+    clear_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
+    main()
