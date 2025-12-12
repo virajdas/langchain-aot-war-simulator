@@ -6,6 +6,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from langchain_chroma import Chroma
 import os
+from termcolor import colored
 
 # IMPORTANT VARIABLES
 
@@ -29,7 +30,7 @@ You are taking your next turn in a two-faction geopolitical strategy simulation.
 
 If there are any present previous moves, be sure to retaliate rationally. The previous moves made this session are: {previous_moves}
 
-Based only on your SYSTEM identity instructions, the retrieved lore above, and your stored memory, determine exactly ONE realistic strategic move that advances your faction’s objectives while responding directly to your opponent’s behavior. Assume the consequences of past actions implicitly without external resolution and do not write narrative or explanation. Output only the following structured format: ACTION_TYPE: <Diplomacy | Military | Espionage | Propaganda | Economic | Technology | Fortification | Deterrence> TARGETS: <Who or what is affected> METHOD: <How the move is executed> RESOURCES: <Assets or personnel committed> INTENSITY: <Low | Moderate | High> OBJECTIVE: <Strategic purpose of this move>.
+Based only on your SYSTEM identity instructions, the retrieved lore above, and your stored memory, determine exactly ONE realistic strategic move that advances your faction’s objectives while responding directly to your opponent’s behavior. Assume the consequences of past actions implicitly without external resolution and do not write narrative or explanation. Output only the following structured format (one line per category only). Do not deviate from this format under any circumstances: ACTION_TYPE: <Diplomacy | Military | Espionage | Propaganda | Economic | Technology | Fortification | Deterrence> TARGETS: <Who or what is affected> METHOD: <How the move is executed> RESOURCES: <Assets or personnel committed> INTENSITY: <Low | Moderate | High> OBJECTIVE: <Strategic purpose of this move>.
 """)
 
 parser = StrOutputParser()
@@ -99,7 +100,7 @@ def generate_response(chain, retriever):
         empire = "PARADIS"
     else:
         empire = "MARLEY"
-    print(f"{empire} MOVE:")
+    print(colored(f"\n{empire} MOVE:", "blue"))
     print(result)
     write_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt", f"{empire}:\n{result}")
     
@@ -116,22 +117,22 @@ def main():
     paradis_retriever = paradis_vector_store.as_retriever(
         search_type = "similarity_score_threshold",
         search_kwargs={
-            "k": 2,
-            "score_threshold": 0.1,
+            "k": 3,
+            "score_threshold": 0.2,
         })
     marley_retriever = marley_vector_store.as_retriever(
         search_type = "similarity_score_threshold",
         search_kwargs={
-            "k": 2,
-            "score_threshold": 0.1,
+            "k": 3,
+            "score_threshold": 0.2,
         })
     # Generate responses
     while True:
         generate_response(chain_paradis, paradis_retriever)
         generate_response(chain_marley, marley_retriever)
-        exit_condition = input("Continue simulation? (y/n): ")
+        '''exit_condition = input("\nContinue simulation? (y/n): ")
         if exit_condition.lower() != 'y':
-            break
+            break'''
 
 if __name__ == "__main__":
     clear_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")

@@ -1,0 +1,8 @@
+PARADIS:
+ACTION_TYPE: Military
+TARGETS:
+Marley Nation, Scout Expeditionary Forces (internal)
+METHOD: Deployment and redeployment optimization using existing assets.
+RESOURCES: Garrison defensive corps personnel & Titan deterrence infrastructure committed 60%
+INTENSITY: Moderate 
+OBJECTIVE: Enhance operational flexibility in response to emerging threats.

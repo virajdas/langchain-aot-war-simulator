@@ -79,4 +79,4 @@ ONLY output this structured move.
 
 PARAMETER temperature 0.5
 PARAMETER num_ctx 4096
-PARAMETER repeat_penalty 1.15
+PARAMETER repeat_penalty 1.6
