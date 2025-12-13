@@ -1,8 +1,49 @@
-PARADIS:
-ACTION_TYPE: Military
+
+PARADIS
+ACTION_TYPE: Espionage
 TARGETS:
-Marley Nation, Scout Expeditionary Forces (internal)
-METHOD: Deployment and redeployment optimization using existing assets.
-RESOURCES: Garrison defensive corps personnel & Titan deterrence infrastructure committed 60%
+  Marley Government,
+  
+METHOD:
+
+INTENSITY Low 
+
+OBJECTIVE 
+Gather intelligence on potential diplomatic breakthroughs with non-Marly factions.
+MARLEY
+ACTION_TYPE: Propaganda
+TARGETS:
+  Global Media Networks,
+METHOD: Amplify narrative construction asserting Eldians as existential threats to humanity.
+RESOURCES: Marley Government's Strategic Communications Division, Access Channels for International Broadcasting Network (IBN)
 INTENSITY: Moderate 
-OBJECTIVE: Enhance operational flexibility in response to emerging threats.
+OBJECTIVE Maintain hostile sentiment toward the people of Paradis and prevent fracture in alliance coalition.
+PARADIS
+ACTION_TYPE: Espionage
+TARGETS:
+  Marley Military Defectors and Resistance Pipelines,
+METHOD: Increase covert support network for defector recruitment through Volunteer Support Network.
+RESOURCES: Paradis Intelligence Unit, Access Channels to Secure Communication Networks (SCN)
+INTENSITY: Low 
+OBJECTIVE: Gather strategic intelligence on Titan handler coordination.
+MARLEY
+ACTION_TYPE: Propaganda
+TARGETS:
+  Global Media Outlets and Influencers,
+METHOD: Launch targeted misinformation campaign to reassert Eldians as existential threats, emphasizing global security risks.
+RESOURCES: Marley's Psychological Warfare Unit (20 personnel), Access Channels for Mainstream News Networks 
+INTENSITY: Moderate
+PARADIS
+ACTION_TYPE: Propaganda
+TARGETS:
+Global Media Outlets and Influencers,
+METHOD: Launch targeted counter-narrative campaign to challenge Eldian stereotypes, emphasizing humanity's diversity.
+RESOURCES: Paradis Psychological Warfare Unit (15 personnel), Access Channels for Mainstream News Networks 
+INTENSITY: Moderate OBJECTIVE
+MARLEY
+ACTION_TYPE: Propaganda
+TARGETS:
+Global Media Outlets and Influencers,
+METHOD: Amplify counter-narrative campaign, introduce new Eldian stereotypes to challenge Paradis's claims.
+RESOURCES: 30 personnel from Marley Psychological Warfare Unit (additional training), Access Channels for Mainstream News Networks 
+INTENSITY: High OBJECTIVE
