@@ -1,4 +1,4 @@
-from langchain_ollama.llms import OllamaLLM
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.output_parsers import StrOutputParser
@@ -21,8 +21,8 @@ DB_DIR_MARLEY = "./sql_chroma_db/marley"
 MODEL_NAME_MARLEY = "marley-aot:latest"
 
 # CREATE LLM MODELS
-paradis_model = OllamaLLM(model=MODEL_NAME_PARADIS)
-marley_model = OllamaLLM(model=MODEL_NAME_MARLEY)
+paradis_model = ChatOllama(model=MODEL_NAME_PARADIS)
+marley_model = ChatOllama(model=MODEL_NAME_MARLEY)
 
 # CREATE PROMPT TEMPLATE
 prompt = ChatPromptTemplate.from_template("""
@@ -89,12 +89,16 @@ def format_documents(sections):
         output_string += s.page_content
     return output_string
 
-def generate_response(chain, retriever):
-    document_chain = retriever.invoke("Find the most relevant lore documents for the next move.")
+def generate_response(chain, retriever, movesList):
+    lastMove = ""
+    if(len(movesList) != 0):
+        index = len(movesList) - 1
+        lastMove = movesList[index]
+    document_chain = retriever.invoke(f"Find the most relevant lore documents for the next move using the previous move {lastMove}")
     context = format_documents(document_chain)
     result = chain.invoke({
         "lore": context,
-        "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
+        "previous_moves": lastMove
     })
     if chain == chain_paradis:
         empire = "PARADIS"
@@ -102,9 +106,11 @@ def generate_response(chain, retriever):
         empire = "MARLEY"
     print(colored(f"\n{empire} MOVE:", "blue"))
     print(result)
-    write_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt", f"{empire}:\n{result}")
+    movesList.append(""+empire+" just completed the following move:\n" +result)
+    write_text("previous_moves.txt", "\n" +empire+ "\n"+result)
     
 def main():
+    previousMovesList = []
     # Load and process documents
     paradis_chunks = chunk_pdf(load_pdf("/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.pdf"))
     marley_chunks = chunk_pdf(load_pdf("/workspaces/langchain-aot-war-simulator/Lore/marley_internal.pdf"))
@@ -128,11 +134,14 @@ def main():
         })
     # Generate responses
     while True:
-        generate_response(chain_paradis, paradis_retriever)
-        generate_response(chain_marley, marley_retriever)
-        '''exit_condition = input("\nContinue simulation? (y/n): ")
-        if exit_condition.lower() != 'y':
-            break'''
+        print("\nGenerating Paradis Move:")
+        generate_response(chain_paradis, paradis_retriever, previousMovesList)
+        print("\nGenerating Marley Move:")
+        generate_response(chain_marley, marley_retriever, previousMovesList)
+        keepGoing = input("\n Continue simulation? (y/n): ")
+        if(keepGoing.lower() == "n"):
+            break
+        print("...thinking")
 
 if __name__ == "__main__":
     clear_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
