@@ -1,0 +1,70 @@
+=== CAN USE ===
+- Airship / Zeppelin
+- Anti-Titan Artillery Battery
+- Armored Titan (Reiner Braun)
+- Armored Train (combat)
+- Armored Train Crew
+- Beast Titan (Zeke Yeager)
+- Cart Titan (Pieck Finger)
+- Coastal Patrol Boat
+- Colossal Titan (Armin Arlert)
+- Combat Engineer / Demolitions
+- Female Titan (Annie Leonhart)
+- Field Ambulance
+- Fixed-Wing Bomber
+- Fixed-Wing Recon Plane
+- Gabi Braun
+- Jaw Titan (Porco Galliard / Falco Grice)
+- Machine Gun Team
+- Magath Theo
+- Marleyan Army Infantry
+- Marleyan Artillery Crew (field gun)
+- Marleyan Heavy Artillery Crew (howitzer)
+- Marleyan Military Police
+- Marleyan Navy Sailor / Marine
+- Military Intelligence / Recon Team
+- Motorcycle Scout
+- Paratrooper / Airborne Infantry
+- Pure Titan (abnormal)
+- Pure Titan (standard)
+- Rail Train (transport)
+- Submarine
+- Trench Raider / Shock Trooper
+- Truck / Motor Transport
+- War Hammer Titan (Lara Tybur)
+- Warship / Dreadnought
+
+=== CANNOT USE ===
+- Artillery Crew (anti-Titan gun)
+- Artillery Crew (field gun)
+- Attack Titan (Eren Yeager)
+- Cadet Corps (generic cadet)
+- Connie Springer
+- Engineers / Sappers
+- Erwin Smith
+- Floch Forster
+- Founding Titan (Eren Yeager)
+- Garrison Regiment (infantry)
+- Hange Zoë
+- Historia Reiss
+- Horse Cavalry / Mounted Scout
+- Horse-Drawn Wagon (transport)
+- Jean Kirstein
+- Levi Ackerman
+- Logistics / Supply Train
+- Medical Corps / Field Medic
+- Mikasa Ackerman
+- Military Police Brigade (MP)
+- Mortar Team
+- ODM Gear Trooper (elite)
+- ODM Gear Trooper (standard)
+- Rifle Infantry (bolt-action)
+- Rifle Infantry (semi-auto / late-war)
+- Sasha Blouse
+- Signal / Communications Team
+- Sniper / Marksman
+- Survey Corps (Scouts) infantry
+- Survey Corps Elite (veteran squad)
+- Thunder Spear Squad
+- Wall Titan (Colossal-class Rumbling unit)
+- Yeagerists (paramilitary)

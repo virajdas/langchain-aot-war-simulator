@@ -1,8 +1,12 @@
 PARADIS:
-ACTION_TYPE: Military
-TARGETS:
-Marley Nation, Scout Expeditionary Forces (internal)
-METHOD: Deployment and redeployment optimization using existing assets.
-RESOURCES: Garrison defensive corps personnel & Titan deterrence infrastructure committed 60%
-INTENSITY: Moderate 
-OBJECTIVE: Enhance operational flexibility in response to emerging threats.
+Titan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.
+
+MARLEY:
+I deploy a Coastal Patrol Boat near Liberio's port, utilizing its speed and maneuverability to scout enemy movements and gather intel on the Scount Regiment's deployment. The patrol boat will also serve as a deterrent, making it less likely for the enemy to attempt further operations in this area. This move aims to disrupt Paradis' advance and allow Marleyan forces to prepare a response.
+
+PARADIS:
+I deploy a group of Scout Corps infantry units from Wall Maria's coastline, utilizing their speed and maneuverability to scout the enemy's position near Liberio's port, gathering crucial intel on the terrain and potential landing zones. Meanwhile, I mobilize nearby Engineer sappers to secretly reinforce coastal fortifications with anti-landing artillery coordination, bolstering our defensive posture in response to the patrol boat deployment. Our eyes and ears will remain ever vigilant, tracking enemy movements while we prepare a robust defense against any potential invasion.
+
+MARLEY:
+I will dispatch the Female Titan, Annie Leonhart, to scout from the opposite side of Liberio's coastline, utilizing her tactical adaptability and stealth capabilities to gather crucial intel on Paradis' defensive posture. This strategic reconnaissance will enable me to better understand our opponent's tactics and inform future operations. The Female Titan's presence near the coast will also serve as a deterrent, testing Paradis' ability to respond effectively to our initial probing move.
+

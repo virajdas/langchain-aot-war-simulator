@@ -1,45 +1,55 @@
+'''
+Just to meet the requirement of the assignment to specify what parts of the code were written by AI, I want to credit ChatGPT for writing all of the descriptions and instructions for the AI models (prompts, empire PDFs, units text files, etc.). I have also used the Copilot autocomplete built into VS Code throughout the writing of this code file to help speed up the coding process, but I have personally written and structured all of the code logic, functions, and main program flow.
+
+I have not used the modelfiles that ChatGPT created in this final program as, in my testing and iterating of this project, I found them to be more destructive to the responses than truly helpful. Thus, I am only using the base Llama 3.2 model for both empires as I have been getting stronger generations with it and the prompt, PDFs, and text files (passed to the model to differentiate empire behavior).
+'''
+
+# DEPENDENCIES
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.output_parsers import StrOutputParser
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
-from langchain_chroma import Chroma
-import os
 from termcolor import colored
 
-# IMPORTANT VARIABLES
+# VARIABLES
+PARADIS_PDF_PATH = "/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.pdf"
+MARLEY_PDF_PATH = "/workspaces/langchain-aot-war-simulator/Lore/marley_internal.pdf"
 
-# - PARADIS
-PDF_PATH_PARADIS = "/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.pdf"
-DB_DIR_PARADIS = "./sql_chroma_db/paradis"
-MODEL_NAME_PARADIS = "paradis-aot:latest"
+PARADIS_UNITS_PATH = "/workspaces/langchain-aot-war-simulator/Lore/paradis_units.txt"
+MARLEY_UNITS_PATH = "/workspaces/langchain-aot-war-simulator/Lore/marley_units.txt"
 
-# - MARLEY
-PDF_PATH_MARLEY = "/workspaces/langchain-aot-war-simulator/Lore/marley_internal.pdf"
-DB_DIR_MARLEY = "./sql_chroma_db/marley"
-MODEL_NAME_MARLEY = "marley-aot:latest"
+MOVES_TEXT_FILE_PATH = "previous_moves.txt"
 
-# CREATE LLM MODELS
-paradis_model = OllamaLLM(model=MODEL_NAME_PARADIS)
-marley_model = OllamaLLM(model=MODEL_NAME_MARLEY)
+model = OllamaLLM(model="llama3.2")
 
-# CREATE PROMPT TEMPLATE
 prompt = ChatPromptTemplate.from_template("""
-You are taking your next turn in a two-faction geopolitical strategy simulation. Carefully read and internalize the following lore documents containing factual information about the world, factions, military structures, political dynamics, and historical context: {lore}.
+You are {EMPIRE_NAME}. Read the opponent’s last move below and decide your next move. Stay in-character with {EMPIRE_NAME}’s goals and lore, do not repeat the opponent’s move, do not target your own units, and make a sensible action against the enemy. Output only your next move as plain text. Be as detailed as possible, mentioning specific units, locations, and strategies from the Attack on Titan universe.
 
-If there are any present previous moves, be sure to retaliate rationally. The previous moves made this session are: {previous_moves}
+Opponent’s last move: {OPPONENT_LAST_MOVE}
+                                          
+It is of the utmost importance that you move using only resources, units, and regiments that your nation has, detailed here: {LORE}
+                                          
+Only focus on the present situation and do not predict future moves.
+                                          
+Remember that you are {EMPIRE_NAME}, so you cannot use units, regiments, garrisons, and more that belong to the opposing nation. Please make sure to use as many of your own units in combat as possible and describe their use / action in extreme detail. Here is a list of units available to {EMPIRE_NAME}: {UNITS}
 
-Based only on your SYSTEM identity instructions, the retrieved lore above, and your stored memory, determine exactly ONE realistic strategic move that advances your faction’s objectives while responding directly to your opponent’s behavior. Assume the consequences of past actions implicitly without external resolution and do not write narrative or explanation. Output only the following structured format (one line per category only). Do not deviate from this format under any circumstances: ACTION_TYPE: <Diplomacy | Military | Espionage | Propaganda | Economic | Technology | Fortification | Deterrence> TARGETS: <Who or what is affected> METHOD: <How the move is executed> RESOURCES: <Assets or personnel committed> INTENSITY: <Low | Moderate | High> OBJECTIVE: <Strategic purpose of this move>.
+Avoid taking your opponent's side, and only do what benefits your empire the most (based on the goals of your nation outlined in the lore).
+
+You are only to output a 2-3 sentence move that {EMPIRE_NAME} would realistically make in response to the opponent’s last move, nothing more.
 """)
 
 parser = StrOutputParser()
 
-# CREATE CHAINS
-chain_paradis = prompt | paradis_model | parser
-chain_marley = prompt | marley_model | parser
+# CREATE CHAIN
+chain = prompt | model | parser
 
-def load_text(path):
+# DEFINE FUNCTIONS
+def load_pdf(path):
+    loader = PyPDFLoader(path)
+    pages = loader.load_and_split()
+    return pages
+
+def read_text(path):
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
@@ -51,89 +61,63 @@ def clear_text(path):
     with open(path, "w", encoding="utf-8") as f:
         f.write("")
 
-def load_pdf(path):
-    loader = PyPDFLoader(path)
-    pages = loader.load_and_split()
-    return pages
-
-def chunk_pdf(document):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 700,
-        chunk_overlap = 200,
-        length_function = len,
-        add_start_index = True
-    )
-    chunks = text_splitter.split_documents(document)
-    return chunks
-
-def build_or_load_vectors(empire, chunks):
-    embedding = FastEmbedEmbeddings()
-    if empire == "paradis":
-        if os.path.exists(DB_DIR_PARADIS) and os.listdir(DB_DIR_PARADIS):
-            print("Loading existing vector databases...")
-            vector_store = Chroma(persist_directory=DB_DIR_PARADIS, embedding_function=embedding)
-        else:
-            vector_store = Chroma.from_documents(documents=chunks, embedding=embedding, persist_directory=DB_DIR_PARADIS)
-        return vector_store
-    elif empire == "marley":
-        if os.path.exists(DB_DIR_MARLEY) and os.listdir(DB_DIR_MARLEY):
-            print("Loading existing vector databases...")
-            vector_store = Chroma(persist_directory=DB_DIR_MARLEY, embedding_function=embedding)
-        else:
-            vector_store = Chroma.from_documents(documents=chunks, embedding=embedding, persist_directory=DB_DIR_MARLEY)
-        return vector_store
-
-def format_documents(sections):
-    output_string = ""
-    for s in sections:
-        output_string += s.page_content
-    return output_string
-
-def generate_response(chain, retriever):
-    document_chain = retriever.invoke("Find the most relevant lore documents for the next move.")
-    context = format_documents(document_chain)
-    result = chain.invoke({
-        "lore": context,
-        "previous_moves": load_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
-    })
-    if chain == chain_paradis:
-        empire = "PARADIS"
+def generate_response(empire_name, opponent_last_move, lore, units):
+    response = chain.invoke({"EMPIRE_NAME": empire_name, "OPPONENT_LAST_MOVE": opponent_last_move, "LORE": lore, "UNITS": units})
+    message = f"{empire_name}:\n{response}\n\n"
+    write_text(MOVES_TEXT_FILE_PATH, message)
+    if empire_name == "PARADIS":
+        message = f"{colored(empire_name, 'blue')}:\n{response}\n\n"
     else:
-        empire = "MARLEY"
-    print(colored(f"\n{empire} MOVE:", "blue"))
-    print(result)
-    write_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt", f"{empire}:\n{result}")
-    
+        message = f"{colored(empire_name, 'green')}:\n{response}\n\n"
+    print(message)
+    return response
+
+# MAIN LOGIC
 def main():
-    # Load and process documents
-    paradis_chunks = chunk_pdf(load_pdf("/workspaces/langchain-aot-war-simulator/Lore/paradis_internal.pdf"))
-    marley_chunks = chunk_pdf(load_pdf("/workspaces/langchain-aot-war-simulator/Lore/marley_internal.pdf"))
+    clear_text("previous_moves.txt")
 
-    # Build or load vector databases
-    paradis_vector_store = build_or_load_vectors("paradis", paradis_chunks)
-    marley_vector_store = build_or_load_vectors("marley", marley_chunks)
-
-    # Create retrievers
-    paradis_retriever = paradis_vector_store.as_retriever(
-        search_type = "similarity_score_threshold",
-        search_kwargs={
-            "k": 3,
-            "score_threshold": 0.2,
-        })
-    marley_retriever = marley_vector_store.as_retriever(
-        search_type = "similarity_score_threshold",
-        search_kwargs={
-            "k": 3,
-            "score_threshold": 0.2,
-        })
-    # Generate responses
     while True:
-        generate_response(chain_paradis, paradis_retriever)
-        generate_response(chain_marley, marley_retriever)
-        '''exit_condition = input("\nContinue simulation? (y/n): ")
-        if exit_condition.lower() != 'y':
-            break'''
+        try:
+            num_turns = int(input("Enter number of turns to simulate (excluding opening): "))
+            break
+        except:
+            print("Invalid input. Please enter an integer.")
 
+    while True:
+        try:
+            use_default_opening = int(input("Would you like to use the default opening move or write your own?\n1. Default\n2. Custom\nEnter 1 or 2: "))
+            break
+        except:
+            print("Invalid input. Please enter an integer.")
+
+    if use_default_opening == 1:
+        message = f"\n{colored('PARADIS (Default Start):', 'blue')}\nTitan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.\n"
+        print(message)
+        write_text(MOVES_TEXT_FILE_PATH, f"PARADIS:\nTitan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.\n\n")
+        response = generate_response("MARLEY", "PARADIS:\nTitan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.", load_pdf("Lore/marley_internal.pdf"), read_text(MARLEY_UNITS_PATH))
+    elif use_default_opening == 2:
+        custom_move = input("Enter your custom opening move from the perspective of PARADIS / New Eldian Empire: ")
+        write_text(MOVES_TEXT_FILE_PATH, f"PARADIS:\n{custom_move}\n\n")
+        print()
+        response = generate_response("MARLEY", custom_move, load_pdf("Lore/marley_internal.pdf"), read_text(MARLEY_UNITS_PATH))
+    else:
+        print("Invalid input. Using default opening move.\n")
+        message = f"\n{colored('PARADIS (Default Start):', 'blue')}\nTitan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.\n"
+        print(message)
+        write_text(MOVES_TEXT_FILE_PATH, f"PARADIS:\nTitan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.\n\n")
+        response = generate_response("MARLEY", "PARADIS:\nTitan and Scount Regiment (lead by Hange Zoe) assault on major Marleyan city and port, Liberio, destroying key military installations and infrastructure to cripple Marleyan defenses. The attack aims to weaken Marley's hold on the region and pave the way for future offensives. We also want to gain a better understanding of the power of the Titans and our role as subjects of Ymir.", load_pdf("Lore/marley_internal.pdf"), read_text(MARLEY_UNITS_PATH))
+
+    for i in range(num_turns - 1):
+        if i % 2 == 0:
+            empire = "PARADIS"
+            pdf = PARADIS_PDF_PATH
+            units = PARADIS_UNITS_PATH
+        else:
+            empire = "MARLEY"
+            pdf = MARLEY_PDF_PATH
+            units = MARLEY_UNITS_PATH
+        response = generate_response(empire, response, load_pdf(pdf), read_text(units))
+
+# RUN MAIN
 if __name__ == "__main__":
-    clear_text("/workspaces/langchain-aot-war-simulator/previous_moves.txt")
     main()
